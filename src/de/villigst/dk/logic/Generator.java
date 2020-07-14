@@ -32,7 +32,6 @@ public class Generator {
 
     public static void generateNamensschilder(List<DKMember> members) {
         Logger.info("Generiere Namensschilder...");
-        //TODO: Not working
         List<String> pages = new ArrayList<>();
         List<String> schilder = new ArrayList<>();
         for(int i = 0; i < members.size(); i++) {
