@@ -31,7 +31,7 @@ public class MemberImport {
             members.add(m);
         }
         //Save to persistence
-        Persistent.members = members;
+        Persistent.members.addAll(members);
     }
 
     public static void importCSVFile(@NotNull String csvFilePath) {
