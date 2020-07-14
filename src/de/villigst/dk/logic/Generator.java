@@ -2,6 +2,7 @@ package de.villigst.dk.logic;
 
 import de.villigst.dk.Main;
 import de.villigst.dk.model.DKMember;
+import de.villigst.dk.persistence.Persistent;
 import de.villigst.dk.template.TemplateManager;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class Generator {
         for(DKMember m : members) {
             htmls.add(TemplateManager.MELDESCHILDER.getString(m.getName(), m.getKonvent()));
         }
-        PDFConverter.convert(Main.OUTPUT_PATH + "Meldeschilder.pdf", htmls, true);
+        PDFConverter.convert(Persistent.OUTPUT_PATH + "Meldeschilder.pdf", htmls, true);
     }
 
     /***
@@ -34,7 +35,7 @@ public class Generator {
                 htmls.add(TemplateManager.GREMIENSCHILD.getString(m.getName(), m.getAmt()));
             }
         }
-        PDFConverter.convert(Main.OUTPUT_PATH + "Gremienschilder.pdf", htmls, true);
+        PDFConverter.convert(Persistent.OUTPUT_PATH + "Gremienschilder.pdf", htmls, true);
     }
 
     /***
@@ -53,7 +54,7 @@ public class Generator {
             }
         }
         pages.add(TemplateManager.NAMENSSCHILD_WRAPPER.getString(schilder));
-        PDFConverter.convert(Main.OUTPUT_PATH + "Namensschilder.pdf", pages, false);
+        PDFConverter.convert(Persistent.OUTPUT_PATH + "Namensschilder.pdf", pages, false);
     }
 
 }

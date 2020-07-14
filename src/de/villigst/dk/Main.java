@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Main {
 
-    public static final String OUTPUT_PATH = "out/";
+
     public static final String MEMBER_IMPORT_PATH = "C:\\Users\\topps\\OneDrive - ruhr-uni-bochum.de\\Villigst\\DKen\\HDK 2019\\Teilnehmerverwaltung\\Import OS.csv";
 
     public static void main(String[] args) {
