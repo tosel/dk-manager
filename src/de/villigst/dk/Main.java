@@ -3,6 +3,7 @@ package de.villigst.dk;
 import de.villigst.dk.logic.Generator;
 import de.villigst.dk.logic.MemberImport;
 import de.villigst.dk.model.DKMember;
+import de.villigst.dk.view.ManagerUI;
 
 import java.util.List;
 
@@ -15,13 +16,12 @@ public class Main {
 
     public static void main(String[] args) {
         //Initialize ManagerUI
-        //new ManagerUI();
-        //PDFConverter converter = new PDFConverter(TEMPLATE_MELDESCHILD_PATH, OUTPUT_PDF_PATH);
-        //converter.convert(true);
+        new ManagerUI();
 
+        //Read members
         List<DKMember> members = MemberImport.importCSVFile(MEMBER_IMPORT_PATH);
         for(DKMember m : members) {
-            //System.out.println(m.toString());
+            System.out.println(m.toString());
         }
         Generator.generateMeldeschilder(members);
         Generator.generateNamensschilder(members);

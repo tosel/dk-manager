@@ -14,6 +14,12 @@ import java.util.List;
 
 public class PDFConverter {
 
+    /***
+     *
+     * @param pdfDestPath Pfad der Zieldatei
+     * @param htmls HTML-Input - Eine Seite pro Item
+     * @param landscape Orientierung des Dokumentes
+     */
     public static void convert(@NotNull String pdfDestPath, @NotNull List<String> htmls, boolean landscape) {
         try {
             PdfWriter writer = new PdfWriter(pdfDestPath);

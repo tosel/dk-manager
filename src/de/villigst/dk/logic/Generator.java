@@ -9,6 +9,10 @@ import java.util.List;
 
 public class Generator {
 
+    /***
+     * Generiert ein PDF mit den Hochhalteschildern zum Melden für alle DK Teilnehmer
+     * @param members Alle Teilnehmenden der DK
+     */
     public static void generateMeldeschilder(List<DKMember> members) {
         Logger.info("Generiere Meldeschilder...");
         List<String> htmls = new ArrayList<>();
@@ -18,6 +22,10 @@ public class Generator {
         PDFConverter.convert(Main.OUTPUT_PATH + "Meldeschilder.pdf", htmls, true);
     }
 
+    /***
+     * Generiert ein PDF mit den Tischschildern für die Gremianer*innen.
+     * @param members Alle Teilnehmenden der DK. Verwendet nur die Gremianer. Prüft nach Kommentar-Zeile
+     */
     public static void generateGremienschilder(List<DKMember> members) {
         Logger.info("Generiere Gremienschilder...");
         List<String> htmls = new ArrayList<>();
@@ -29,6 +37,10 @@ public class Generator {
         PDFConverter.convert(Main.OUTPUT_PATH + "Gremienschilder.pdf", htmls, true);
     }
 
+    /***
+     *
+     * @param members Alle Teilnehmenden der DK
+     */
     public static void generateNamensschilder(List<DKMember> members) {
         Logger.info("Generiere Namensschilder...");
         List<String> pages = new ArrayList<>();
