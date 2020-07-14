@@ -4,7 +4,6 @@ import de.villigst.dk.Main;
 import de.villigst.dk.model.DKMember;
 import de.villigst.dk.template.TemplateManager;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

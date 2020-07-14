@@ -2,9 +2,7 @@ package de.villigst.dk;
 
 import de.villigst.dk.logic.Generator;
 import de.villigst.dk.logic.MemberImport;
-import de.villigst.dk.logic.PDFConverter;
 import de.villigst.dk.model.DKMember;
-import de.villigst.dk.view.ManagerUI;
 
 import java.util.List;
 
