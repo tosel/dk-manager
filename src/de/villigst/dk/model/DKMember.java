@@ -4,13 +4,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class DKMember {
 
-    private String name, konvent;
-    private boolean gremium;
+    private String name, konvent, amt;
 
-    public DKMember(@NotNull String name, @NotNull String konvent, boolean gremium) {
+    public DKMember(@NotNull String name, @NotNull String konvent, String amt) {
         this.name = name;
         this.konvent = konvent;
-        this.gremium = gremium;
+        this.amt = amt;
     }
 
     public String getName() {
@@ -29,11 +28,26 @@ public class DKMember {
         this.konvent = konvent;
     }
 
-    public boolean isGremium() {
-        return gremium;
+    public String getAmt() {
+        return amt;
     }
 
-    public void setGremium(boolean gremium) {
-        this.gremium = gremium;
+    public void setAmt(String amt) {
+        this.amt = amt;
+    }
+
+    public boolean isGremium() {
+        //Threshold für Nullbyte/Zeilenumburch/etc.
+        return getAmt().length() > 4;
+    }
+
+    @Override
+    public String toString() {
+        return "DKMember{" +
+                "name='" + name + '\'' +
+                ", konvent='" + konvent + '\'' +
+                ", amt=" + amt +
+                ", gremium=" + isGremium() +
+                '}';
     }
 }
