@@ -1,4 +1,4 @@
-package de.villigst.dk;
+package de.villigst.dk.view;
 
 import javax.swing.*;
 
@@ -10,7 +10,7 @@ public class UI extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
 
-        
+
         this.setVisible(true);
     }
 
