@@ -9,7 +9,11 @@ public class Logger {
     }
 
     public static void error(@NotNull String msg) {
-        System.out.println("[ERROR] " + msg);
+        System.err.println("[ERROR] " + msg);
+    }
+
+    public static void debug(@NotNull String msg) {
+        System.out.println("[Debug] " + msg);
     }
 
 }
