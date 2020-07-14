@@ -1,6 +1,7 @@
 package de.villigst.dk.logic;
 
 import de.villigst.dk.model.DKMember;
+import de.villigst.dk.persistence.Persistent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,15 +13,13 @@ import java.util.List;
 
 public class MemberImport {
 
-    @Nullable
-    private static List<DKMember> importCSV(@NotNull List<String> lines) {
+    private static void importCSV(@NotNull List<String> lines) {
         Logger.info("Importiere Teilnehmende aus Datei...");
         //first line = column-definitions
         String[] definitions = lines.get(0).split(";");
         //check for right definitions
         if(!definitions[1].equalsIgnoreCase("vorname") || !definitions[2].equalsIgnoreCase("nachname") || !definitions[6].equalsIgnoreCase("Kommentar")){
             Logger.error("Wrong definition for import. Use 'Titel;Vorname;Nachname;Gliederungsebene;Teilnehmernummer;Gruppen;Kommentar;Ist aktiv;Ist anwesend;Ist Gremium;Initiales Passwort;E-Mail'.");
-            return null;
         }
         //Erstelle Objekte
         List<DKMember> members = new ArrayList<>();
@@ -31,11 +30,11 @@ public class MemberImport {
             DKMember m = new DKMember(contents[1], konvent, contents[6]);
             members.add(m);
         }
-        return members;
+        //Save to persistence
+        Persistent.members = members;
     }
 
-    @Nullable
-    public static List<DKMember> importCSVFile(@NotNull String csvFilePath) {
+    public static void importCSVFile(@NotNull String csvFilePath) {
         Logger.info("Lese Datei ein...");
         try {
             BufferedReader reader = new BufferedReader(new FileReader(csvFilePath));
@@ -47,10 +46,9 @@ public class MemberImport {
                 line = reader.readLine();
             }
             reader.close();
-            return importCSV(lines);
+            importCSV(lines);
         }catch(IOException ex) {
             Logger.error("Import failed: " + ex.getMessage());
-            return null;
         }
     }
 
