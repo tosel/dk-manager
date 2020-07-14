@@ -2,9 +2,9 @@ package de.villigst.dk.view;
 
 import javax.swing.*;
 
-public class UI extends JFrame {
+public class ManagerUI extends JFrame {
 
-    public UI() {
+    public ManagerUI() {
         this.setTitle("DK Manager");
         this.setSize(1000, 600);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
