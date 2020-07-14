@@ -4,6 +4,8 @@ import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +17,7 @@ public class PDFConverter {
     private final String htmlSrc, pdfDest;
     private File htmlSrcFile, pdfDestFile;
 
-    public PDFConverter(String htmlSrc, String pdfDest) {
+    public PDFConverter(@NotNull String htmlSrc, @NotNull String pdfDest) {
         this.htmlSrc = htmlSrc;
         this.pdfDest = pdfDest;
 
@@ -27,6 +29,7 @@ public class PDFConverter {
 
     }
 
+    @Nullable
     public File convert(boolean landscape) {
         if(!htmlSrcFile.exists()) {
             Logger.error("Invalid source file: Not found");

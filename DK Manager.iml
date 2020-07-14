@@ -10,5 +10,14 @@
     <orderEntry type="library" name="itextpdf" level="project" />
     <orderEntry type="library" name="html2pdf-3.0.0" level="project" />
     <orderEntry type="library" name="org.slf4j:slf4j-jdk14:1.7.12" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/annotations-17.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

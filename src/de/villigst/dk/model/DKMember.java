@@ -1,11 +1,13 @@
 package de.villigst.dk.model;
 
+import org.jetbrains.annotations.NotNull;
+
 public class DKMember {
 
     private String name, konvent;
     private boolean gremium;
 
-    public DKMember(String name, String konvent, boolean gremium) {
+    public DKMember(@NotNull String name, @NotNull String konvent, boolean gremium) {
         this.name = name;
         this.konvent = konvent;
         this.gremium = gremium;
