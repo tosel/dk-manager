@@ -50,6 +50,17 @@ public class DKMember {
         return getAmt().length() > 4;
     }
 
+    public boolean isGS() {
+        return konvent.equalsIgnoreCase("Geschäftsstelle")
+                || konvent.equalsIgnoreCase("GS");
+    }
+
+    public boolean isGuest() {
+        return konvent.equalsIgnoreCase("Cusanus")
+                || konvent.equalsIgnoreCase("ESG")
+                || konvent.equalsIgnoreCase("Avicenna");
+    }
+
     @Override
     public String toString() {
         return "DKMember{" +
