@@ -26,9 +26,12 @@ public class MemberImport {
         for(int i = 1; i < lines.size(); i++) {
             String line = lines.get(i);
             String[] contents = line.split(";");
-            String konvent = contents[2].replace("(", "").replace(")", "");
-            DKMember m = new DKMember(contents[1], konvent, contents[6]);
-            members.add(m);
+            //Leere zeilen überspringen
+            if(contents.length > 6 && contents[1] != null && contents[2] != null && contents[6] != null) {
+                String konvent = contents[2].replace("(", "").replace(")", "");
+                DKMember m = new DKMember(contents[1], konvent, contents[6]);
+                members.add(m);
+            }
         }
         //Save to persistence
         Persistent.members.addAll(members);
