@@ -1,9 +1,8 @@
 package de.villigst.dk.logic;
 
-import de.villigst.dk.Main;
 import de.villigst.dk.model.DKMember;
-import de.villigst.dk.persistence.Persistent;
 import de.villigst.dk.template.TemplateManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,7 +14,7 @@ public class Generator {
      * Generiert ein PDF mit den Hochhalteschildern zum Melden für alle DK Teilnehmer
      * @param members Alle Teilnehmenden der DK
      */
-    public static void generateMeldeschilder(List<DKMember> members, File target) {
+    public static void generateMeldeschilder(@NotNull List<DKMember> members, File target) {
         Logger.info("Generiere Meldeschilder...");
         List<String> htmls = new ArrayList<>();
         for(DKMember m : members) {
@@ -28,7 +27,7 @@ public class Generator {
      * Generiert ein PDF mit den Tischschildern für die Gremianer*innen.
      * @param members Alle Teilnehmenden der DK. Verwendet nur die Gremianer. Prüft nach Kommentar-Zeile
      */
-    public static void generateGremienschilder(List<DKMember> members, File target) {
+    public static void generateGremienschilder(@NotNull List<DKMember> members, File target) {
         Logger.info("Generiere Gremienschilder...");
         List<String> htmls = new ArrayList<>();
         for(DKMember m : members) {
@@ -43,7 +42,7 @@ public class Generator {
      *
      * @param members Alle Teilnehmenden der DK
      */
-    public static void generateNamensschilder(List<DKMember> members, File target) {
+    public static void generateNamensschilder(@NotNull List<DKMember> members, File target) {
         Logger.info("Generiere Namensschilder...");
         List<String> pages = new ArrayList<>();
         List<String> schilder = new ArrayList<>();

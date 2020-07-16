@@ -2,7 +2,6 @@ package de.villigst.dk.controller;
 
 import de.villigst.dk.FXMain;
 import de.villigst.dk.logic.Generator;
-import de.villigst.dk.logic.Logger;
 import de.villigst.dk.logic.MemberImport;
 import de.villigst.dk.model.DKMember;
 import de.villigst.dk.persistence.Persistent;
@@ -24,7 +23,10 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
 
@@ -188,7 +190,15 @@ public class MainController implements Initializable {
         fileChooser.setTitle("Speichern: Namensschilder");
         File selectedFile = fileChooser.showSaveDialog(FXMain.stage);
         if(selectedFile != null) {
-            Generator.generateNamensschilder(Persistent.members, selectedFile);
+            if(Persistent.members.size() > 0) {
+                Generator.generateNamensschilder(Persistent.members, selectedFile);
+            }else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Fehler");
+                alert.setHeaderText(null);
+                alert.setContentText("Keine Teilnehmer zum Drucken vorhanden!");
+                alert.show();
+            }
         }
     }
 
@@ -197,7 +207,15 @@ public class MainController implements Initializable {
         fileChooser.setTitle("Speichern: Meldeschilder");
         File selectedFile = fileChooser.showSaveDialog(FXMain.stage);
         if(selectedFile != null) {
-            Generator.generateMeldeschilder(Persistent.members, selectedFile);
+            if(Persistent.members.size() > 0) {
+                Generator.generateMeldeschilder(Persistent.members, selectedFile);
+            }else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Fehler");
+                alert.setHeaderText(null);
+                alert.setContentText("Keine Teilnehmer zum Drucken vorhanden!");
+                alert.show();
+            }
         }
     }
 
@@ -206,7 +224,15 @@ public class MainController implements Initializable {
         fileChooser.setTitle("Speichern: Gremienschilder");
         File selectedFile = fileChooser.showSaveDialog(FXMain.stage);
         if(selectedFile != null) {
-            Generator.generateGremienschilder(Persistent.members, selectedFile);
+            if(Persistent.members.size() > 0) {
+                Generator.generateGremienschilder(Persistent.members, selectedFile);
+            }else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Fehler");
+                alert.setHeaderText(null);
+                alert.setContentText("Keine Teilnehmer zum Drucken vorhanden!");
+                alert.show();
+            }
         }
     }
 

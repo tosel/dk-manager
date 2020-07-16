@@ -3,7 +3,6 @@ package de.villigst.dk.logic;
 import de.villigst.dk.model.DKMember;
 import de.villigst.dk.persistence.Persistent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

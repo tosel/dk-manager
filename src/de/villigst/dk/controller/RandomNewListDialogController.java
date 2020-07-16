@@ -3,21 +3,14 @@ package de.villigst.dk.controller;
 import de.villigst.dk.model.DKMember;
 import de.villigst.dk.persistence.Persistent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
-import javax.xml.crypto.Data;
-import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ResourceBundle;
 
 public class RandomNewListDialogController extends Dialog {
 
