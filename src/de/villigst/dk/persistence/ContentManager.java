@@ -18,6 +18,10 @@ public class ContentManager {
     //Resource:
     //https://www.baeldung.com/jackson-object-mapper-tutorial
 
+    public static void onValueChange() {
+
+    }
+
     public void saveToFile(String path) {
         try {
             File destinationFile = new File(path);

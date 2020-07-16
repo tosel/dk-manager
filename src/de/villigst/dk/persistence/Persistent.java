@@ -36,6 +36,7 @@ public class Persistent {
 
     public static void setMembers(List<DKMember> members) {
         Persistent.members = members;
+        ContentManager.onValueChange();
     }
 
     public static int getStatMG() {
@@ -44,6 +45,7 @@ public class Persistent {
 
     public static void setStatMG(int stat_mg) {
         Persistent.stat_mg = stat_mg;
+        ContentManager.onValueChange();
     }
 
     public static int getStatWG() {
@@ -52,6 +54,7 @@ public class Persistent {
 
     public static void setStatWG(int stat_wg) {
         Persistent.stat_wg = stat_wg;
+        ContentManager.onValueChange();
     }
 
     public static int getStatDG() {
@@ -60,6 +63,7 @@ public class Persistent {
 
     public static void setStatDG(int stat_dg) {
         Persistent.stat_dg = stat_dg;
+        ContentManager.onValueChange();
     }
 
     public static int getStatMS() {
@@ -68,6 +72,7 @@ public class Persistent {
 
     public static void setStatMS(int stat_ms) {
         Persistent.stat_ms = stat_ms;
+        ContentManager.onValueChange();
     }
 
     public static int getStatWS() {
@@ -76,6 +81,7 @@ public class Persistent {
 
     public static void setStatWS(int stat_ws) {
         Persistent.stat_ws = stat_ws;
+        ContentManager.onValueChange();
     }
 
     public static int getStatDS() {
@@ -84,6 +90,7 @@ public class Persistent {
 
     public static void setStatDS(int stat_ds) {
         Persistent.stat_ds = stat_ds;
+        ContentManager.onValueChange();
     }
 
     public static HashMap<String, List<DKMember>> getRandomLists() {
@@ -92,6 +99,7 @@ public class Persistent {
 
     public static void setRandomLists(HashMap<String, List<DKMember>> random_lists) {
         Persistent.random_lists = random_lists;
+        ContentManager.onValueChange();
     }
 
     public static HashMap<String, HashMap<String, BooleanProperty>> getRandomListsSelected() {
@@ -100,6 +108,7 @@ public class Persistent {
 
     public static void setRandomListsSelected(HashMap<String, HashMap<String, BooleanProperty>> random_lists_selected) {
         Persistent.random_lists_selected = random_lists_selected;
+        ContentManager.onValueChange();
     }
 
     public static HashMap<String, BooleanProperty> getPrintSelected() {
@@ -108,6 +117,7 @@ public class Persistent {
 
     public static void setPrintSelected(HashMap<String, BooleanProperty> print_selected) {
         Persistent.print_selected = print_selected;
+        ContentManager.onValueChange();
     }
 
     public static String getNotes() {
@@ -116,5 +126,6 @@ public class Persistent {
 
     public static void setNotes(String notes) {
         Persistent.notes = notes;
+        ContentManager.onValueChange();
     }
 }
