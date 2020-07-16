@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
@@ -31,7 +32,7 @@
                               <Font size="23.0" />
                            </font>
                         </Label>
-                        <TextArea fx:id="overview_ta_notes" layoutX="29.0" layoutY="59.0" prefHeight="471.0" prefWidth="367.0">
+                        <TextArea fx:id="overview_ta_notes" layoutX="29.0" layoutY="59.0" onKeyTyped="#overview_ta_onkeytyped" prefHeight="471.0" prefWidth="367.0">
                            <font>
                               <Font size="16.0" />
                            </font>
@@ -231,7 +232,7 @@
                               <Font size="16.0" />
                            </font>
                         </Button>
-                        <GridPane alignment="CENTER" gridLinesVisible="true" layoutX="338.0" layoutY="339.0" prefHeight="143.0" prefWidth="342.0">
+                        <GridPane fx:id="stats_table" alignment="CENTER" gridLinesVisible="true" layoutX="338.0" layoutY="339.0" prefHeight="143.0" prefWidth="342.0">
                            <columnConstraints>
                               <ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="10.0" prefWidth="83.0" />
                               <ColumnConstraints hgrow="SOMETIMES" maxWidth="173.0" minWidth="10.0" prefWidth="132.0" />
@@ -332,9 +333,61 @@
                                     <Insets left="65.0" />
                                  </padding>
                               </Label>
+                              <TextField fx:id="stats_tf_mg" prefWidth="94.0" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font size="16.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets left="55.0" />
+                                 </padding>
+                              </TextField>
+                              <TextField fx:id="stats_tf_wg" prefWidth="94.0" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font size="16.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets left="55.0" />
+                                 </padding>
+                              </TextField>
+                              <TextField fx:id="stats_tf_dg" prefWidth="94.0" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                 <padding>
+                                    <Insets left="55.0" />
+                                 </padding>
+                                 <font>
+                                    <Font size="16.0" />
+                                 </font>
+                              </TextField>
+                              <TextField fx:id="stats_tf_ms" prefWidth="94.0" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                 <padding>
+                                    <Insets left="65.0" />
+                                 </padding>
+                                 <font>
+                                    <Font size="16.0" />
+                                 </font>
+                              </TextField>
+                              <TextField fx:id="stats_tf_ws" prefWidth="94.0" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                                 <font>
+                                    <Font size="16.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets left="65.0" />
+                                 </padding>
+                              </TextField>
+                              <TextField fx:id="stats_tf_ds" prefWidth="94.0" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                 <padding>
+                                    <Insets left="65.0" />
+                                 </padding>
+                                 <font>
+                                    <Font size="16.0" />
+                                 </font>
+                              </TextField>
                            </children>
                         </GridPane>
                         <Label layoutX="184.0" layoutY="342.0" text="Sonstige" />
+                        <Button fx:id="stats_btn_edit" layoutX="607.0" layoutY="490.0" mnemonicParsing="false" onAction="#stats_edit" text="Bearbeiten" />
                      </children>
                   </AnchorPane>
                </content>
@@ -368,11 +421,37 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Label layoutX="39.0" layoutY="30.0" text="Work in progress...">
+                        <Label layoutX="39.0" layoutY="30.0" text="Beschlusssammlung aktualisieren">
                            <font>
                               <Font size="23.0" />
                            </font>
                         </Label>
+                        <Spinner fx:id="bs_sp_dk" layoutX="39.0" layoutY="102.0" prefHeight="25.0" prefWidth="262.0" />
+                        <Spinner fx:id="bs_sp_year" layoutX="310.0" layoutY="102.0" />
+                        <Label layoutX="39.0" layoutY="79.0" text="Delegiertenkonferenz:" />
+                        <Label layoutX="39.0" layoutY="151.0" text="Inhaltsverzeichnis" />
+                        <Button fx:id="bs_btn_contents" layoutX="39.0" layoutY="174.0" mnemonicParsing="false" onAction="#bs_choose_contents" prefHeight="37.0" prefWidth="236.0" text="PDF Datei auswählen...">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
+                        <Label layoutX="39.0" layoutY="235.0" text="Letzte Version" />
+                        <Button fx:id="bs_btn_lastBS" layoutX="39.0" layoutY="258.0" mnemonicParsing="false" onAction="#bs_choose_lastversion" prefHeight="37.0" prefWidth="236.0" text="PDF Datei auswählen...">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
+                        <Label layoutX="310.0" layoutY="235.0" text="Beschlüsse ab Seite" />
+                        <TextField fx:id="bs_tf_page" layoutX="310.0" layoutY="258.0" prefHeight="37.0" prefWidth="104.0" promptText="Seite">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </TextField>
+                        <Button layoutX="39.0" layoutY="346.0" mnemonicParsing="false" onAction="#bs_generate" prefHeight="86.0" prefWidth="239.0" text="Neue Beschlusssammlung&#10;generieren" textAlignment="CENTER">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
                      </children>
                   </AnchorPane>
                </content>

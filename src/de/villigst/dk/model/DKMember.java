@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jetbrains.annotations.NotNull;
 
-public class DKMember {
+public class DKMember implements Comparable<DKMember> {
 
     private String name, konvent, amt;
 
@@ -19,6 +19,13 @@ public class DKMember {
         this.name = name;
         this.konvent = konvent;
         this.amt = amt;
+    }
+
+    @Override
+    public int compareTo(@NotNull DKMember compareTo) {
+        String compare = compareTo.getDisplay();
+        String here = this.getDisplay();
+        return here.compareTo(compare);
     }
 
     public String getName() {
@@ -38,7 +45,7 @@ public class DKMember {
     }
 
     public String getAmt() {
-        return amt;
+        return konvent.equalsIgnoreCase("Programmausschuss")||konvent.equalsIgnoreCase("PA")?"PA-Mitglied":amt;
     }
 
     public void setAmt(String amt) {
@@ -47,7 +54,16 @@ public class DKMember {
 
     public boolean isGremium() {
         //Threshold für Nullbyte/Zeilenumburch/etc.
-        return getAmt().length() > 4;
+        return getAmt().length() > 4 || konvent.equalsIgnoreCase("Programmausschuss") || konvent.equalsIgnoreCase("PA");
+    }
+
+    public boolean isPA() {
+        return konvent.equalsIgnoreCase("Programmausschuss") || konvent.equalsIgnoreCase("PA");
+    }
+
+    public boolean isSenat() {
+        //Threshold für Nullbyte/Zeilenumburch/etc.
+        return getAmt().length() > 4 && !(getAmt().contains("PA") || getAmt().contains("Programmausschuss"));
     }
 
     public boolean isGS() {
@@ -58,6 +74,20 @@ public class DKMember {
     public boolean isGuest() {
         return konvent.equalsIgnoreCase("Cusanus")
                 || konvent.equalsIgnoreCase("ESG")
+                || konvent.equalsIgnoreCase("ELES")
+                || konvent.equalsIgnoreCase("HBS")
+                || konvent.equalsIgnoreCase("Hans-Böckler")
+                || konvent.equalsIgnoreCase("Hans Böckler")
+                || konvent.equalsIgnoreCase("Heinrich-Böll")
+                || konvent.equalsIgnoreCase("Heinrich Böll")
+                || konvent.equalsIgnoreCase("Studienstiftung")
+                || konvent.equalsIgnoreCase("KAS")
+                || konvent.equalsIgnoreCase("FES")
+                || konvent.equalsIgnoreCase("SDW")
+                || konvent.equalsIgnoreCase("FNS")
+                || konvent.equalsIgnoreCase("HNS")
+                || konvent.equalsIgnoreCase("RLS")
+                || konvent.equalsIgnoreCase("RoLux")
                 || konvent.equalsIgnoreCase("Avicenna");
     }
 
@@ -68,6 +98,13 @@ public class DKMember {
                 ", konvent='" + konvent + '\'' +
                 ", amt=" + amt +
                 ", gremium=" + isGremium() +
+                ", guest=" + isGuest() +
+                ", gs=" + isGS() +
                 '}';
+    }
+
+    public String getDisplay() {
+        String amt = isGremium()?" [" + getAmt() + "]":"";
+        return name + " (" + konvent + ")" + amt;
     }
 }

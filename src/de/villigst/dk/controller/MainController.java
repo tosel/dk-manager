@@ -5,10 +5,15 @@ import de.villigst.dk.logic.Generator;
 import de.villigst.dk.logic.MemberImport;
 import de.villigst.dk.model.DKMember;
 import de.villigst.dk.persistence.Persistent;
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -16,17 +21,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainController implements Initializable {
 
@@ -53,19 +58,119 @@ public class MainController implements Initializable {
         random_listview_created.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue observableValue, String oldValue, String newValue) {
+                random_selectedList = newValue;
                 if(newValue != null) {
                     random_listview_selected.getItems().clear();
                     for (DKMember m : Persistent.random_lists.get(newValue)) {
-                        String gremium = m.isGremium() ? " [" + m.getAmt() + "]" : "";
-                        String name = m.getName() + " (" + m.getKonvent() + ")" + gremium;
-                        random_listview_selected.getItems().add(name);
+                        random_listview_selected.getItems().add(m.getDisplay());
                     }
                 }
             }
         });
+
+        //Initialize Context-Menu for members-listview
+        members_listview.setCellFactory(lv -> {
+            ListCell<String> cell = new ListCell<>();
+
+            ContextMenu menu = new ContextMenu();
+
+            MenuItem members_listview_context_edit = new MenuItem("Bearbeiten");
+            members_listview_context_edit.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent actionEvent) {
+                    for(DKMember member : Persistent.members) {
+                        if(cell.itemProperty().getValue().equals(member.getDisplay())) {
+                            //FOUND
+                            //TODO implement
+                            break;
+                        }
+                    }
+                    refresh_members();
+                }
+            });
+            MenuItem members_listview_context_delete = new MenuItem("Entfernen");
+            members_listview_context_delete.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent actionEvent) {
+                    for(DKMember member : Persistent.members) {
+                        if(cell.itemProperty().getValue().equals(member.getDisplay())) {
+                            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Teilnehmer wirklich entfernen?", ButtonType.CANCEL, ButtonType.YES);
+                            alert.setTitle("Teilnehmer entfernen");
+                            alert.setHeaderText(null);
+                            alert.showAndWait();
+                            if(alert.getResult() == ButtonType.YES) {
+                                Persistent.members.remove(member);
+                            }
+                            break;
+                        }
+                    }
+                    refresh_members();
+                }
+            });
+            menu.getItems().addAll(members_listview_context_edit, members_listview_context_delete);
+
+            cell.textProperty().bind(cell.itemProperty());
+
+            cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
+                if(isNowEmpty) {
+                    cell.setContextMenu(null);
+                }else {
+                    cell.setContextMenu(menu);
+                }
+            });
+
+            return cell;
+        });
+
+        //Initialize Spinners from Beschlusssammlung
+        ObservableList<String> items = FXCollections.observableArrayList("Frühjahrsdelegiertenkonferenz", "Herbstdelegiertenkonferenz", "Sonderdelegiertenkonferenz");
+        SpinnerValueFactory<String> spinnerValueFactoryDK = new SpinnerValueFactory.ListSpinnerValueFactory<>(items);
+        bs_sp_dk.setValueFactory(spinnerValueFactoryDK);
+
+        SpinnerValueFactory<Integer> spinnerValueFactoryYear = new SpinnerValueFactory.IntegerSpinnerValueFactory(
+                Calendar.getInstance().get(Calendar.YEAR) - 5,
+                Calendar.getInstance().get(Calendar.YEAR) + 5,
+                Calendar.getInstance().get(Calendar.YEAR));
+        bs_sp_year.setValueFactory(spinnerValueFactoryYear);
+        
+        
+        //Initialize checkboxes for print
+        print_listview.setCellFactory(CheckBoxListCell.forListView(new Callback<String, ObservableValue<Boolean>>() {
+            @Override
+            public ObservableValue<Boolean> call(String item) {
+                if(Persistent.print_selected.get(item) == null) {
+                    BooleanProperty prop = new SimpleBooleanProperty(false);
+                    prop.addListener((obs, wasSelected, isNowSelected) -> {
+                        Persistent.print_selected.put(item, prop);
+                    });
+                    Persistent.print_selected.put(item, prop);
+                }
+                return Persistent.print_selected.get(item);
+            }
+        }));
+
+        //Initialize checkboxes for random lists
+        random_listview_selected.setCellFactory(CheckBoxListCell.forListView(new Callback<String, ObservableValue<Boolean>>() {
+            @Override
+            public ObservableValue<Boolean> call(String s) {
+                if(random_selectedList == null) {
+                    //keine Liste ausgewählt
+                    return new SimpleBooleanProperty(false);
+                }else {
+                    System.out.println(random_selectedList);
+                    if(Persistent.random_lists_selected.get(random_selectedList).get(s) == null) {
+                        Persistent.random_lists_selected.get(random_selectedList).put(s, new SimpleBooleanProperty(false));
+                    }
+                }
+                return Persistent.random_lists_selected.get(random_selectedList).get(s);
+            }
+        }));
     }
 
+
+
     private void refresh_members() {
+        Collections.sort(Persistent.members);
         members_refresh_listview();
         print_refresh_listview();
     }
@@ -74,6 +179,10 @@ public class MainController implements Initializable {
 
     @FXML
     TextArea overview_ta_notes;
+
+    public void overview_ta_onkeytyped() {
+        Persistent.notes = overview_ta_notes.getText();
+    }
 
     public void overview_reset_content() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Wirklich alle Inhalte zurücksetzen?", ButtonType.CANCEL, ButtonType.YES);
@@ -102,6 +211,8 @@ public class MainController implements Initializable {
     ListView members_listview;
     @FXML
     AnchorPane members_anchor;
+    //@FXML
+    //ContextMenu members_listview_context;
 
     public void members_csv_import(){
         FileChooser fileChooser = new FileChooser();
@@ -120,7 +231,7 @@ public class MainController implements Initializable {
             Parent root = FXMLLoader.load(url);
             Stage stage = new Stage();
             stage.setTitle("Neuen Teilnehmer hinzufügen");
-            stage.setScene(new Scene(root, 300, 400));
+            stage.setScene(new Scene(root, 300, 450));
             stage.setResizable(false);
             stage.showAndWait();
 
@@ -146,13 +257,10 @@ public class MainController implements Initializable {
         if(filter.length() > 0) {
             members_listview.getItems().clear();
             for (DKMember m : Persistent.members) {
-                String gremium = m.isGremium() ? " [" + m.getAmt() + "]" : "";
-                String name = m.getName() + " (" + m.getKonvent() + ")" + gremium;
-                if (name.toLowerCase().contains(filter.toLowerCase())) {
-                    members_listview.getItems().add(name);
+                if (m.getDisplay().toLowerCase().contains(filter.toLowerCase())) {
+                    members_listview.getItems().add(m.getDisplay());
                 }
             }
-            members_listview.getItems().sort(Comparator.naturalOrder());
         }else {
             members_refresh_listview();
         }
@@ -161,10 +269,8 @@ public class MainController implements Initializable {
     private void members_refresh_listview() {
         members_listview.getItems().clear();
         for(DKMember m : Persistent.members) {
-            String gremium = m.isGremium()?" [" + m.getAmt() + "]":"";
-            members_listview.getItems().add(m.getName() + " (" + m.getKonvent() + ")" + gremium);
+            members_listview.getItems().add(m.getDisplay());
         }
-        members_listview.getItems().sort(Comparator.naturalOrder());
     }
 
 
@@ -242,7 +348,54 @@ public class MainController implements Initializable {
         boolean gremienschilder = print_rb_gremienschild.isSelected();
 
         if(namensschilder || meldeschilder || gremienschilder) {
-            //do stuff
+            List<DKMember> toReprint = new ArrayList<>();
+            //unschön...
+            for(String s : Persistent.print_selected.keySet()) {
+                if(Persistent.print_selected.get(s).getValue()) {
+                    for(DKMember m : Persistent.members) {
+                        if(m.getDisplay().equals(s)) {
+                            toReprint.add(m);
+                        }
+                    }
+                }
+            }
+
+            if(!toReprint.isEmpty()) {
+
+                if(gremienschilder) {
+                    for(DKMember m : toReprint) {
+                        if(!m.isGremium()) {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Fehler");
+                            alert.setHeaderText(null);
+                            alert.setContentText("Gremienschilder können nur für Gremianer erstellt werden!");
+                            alert.show();
+                            return;
+                        }
+                    }
+                }
+
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Beschlusssammlung speichern");
+                File selectedFile = fileChooser.showSaveDialog(FXMain.stage);
+
+                if (selectedFile != null) {
+                    if (namensschilder)
+                        Generator.generateNamensschilder(toReprint, selectedFile);
+                    if (meldeschilder)
+                        Generator.generateMeldeschilder(toReprint, selectedFile);
+                    if (gremienschilder) {
+                        Generator.generateGremienschilder(toReprint, selectedFile);
+                    }
+                }
+            }else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Fehler");
+                alert.setHeaderText(null);
+                alert.setContentText("Bitte wähle mindestens einen Teilnehmer aus!");
+                alert.show();
+            }
+
         }else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Fehler");
@@ -257,13 +410,10 @@ public class MainController implements Initializable {
         if(filter.length() > 0) {
             print_listview.getItems().clear();
             for (DKMember m : Persistent.members) {
-                String gremium = m.isGremium() ? " [" + m.getAmt() + "]" : "";
-                String name = m.getName() + " (" + m.getKonvent() + ")" + gremium;
-                if (name.toLowerCase().contains(filter.toLowerCase())) {
-                    print_listview.getItems().add(name);
+                if (m.getDisplay().toLowerCase().contains(filter.toLowerCase())) {
+                    print_listview.getItems().add(m.getDisplay());
                 }
             }
-            print_listview.getItems().sort(Comparator.naturalOrder());
         }else {
             print_refresh_listview();
         }
@@ -272,10 +422,8 @@ public class MainController implements Initializable {
     private void print_refresh_listview() {
         print_listview.getItems().clear();
         for(DKMember m : Persistent.members) {
-            String gremium = m.isGremium()?" [" + m.getAmt() + "]":"";
-            print_listview.getItems().add(m.getName() + " (" + m.getKonvent() + ")" + gremium);
+            print_listview.getItems().add(m.getDisplay());
         }
-        print_listview.getItems().sort(Comparator.naturalOrder());
     }
 
 
@@ -294,11 +442,19 @@ public class MainController implements Initializable {
     CheckBox stats_cb_anzahl;
     @FXML
     CheckBox stats_cb_erlaeuterung;
+    @FXML
+    GridPane stats_table;
+    @FXML
+    Button stats_btn_edit;
 
     @FXML
     Label stats_l_mg, stats_l_wg, stats_l_dg;
     @FXML
     Label stats_l_ms, stats_l_ws, stats_l_ds;
+    @FXML
+    TextField stats_tf_mg, stats_tf_wg, stats_tf_dg;
+    @FXML
+    TextField stats_tf_ms, stats_tf_ws, stats_tf_ds;
 
     public void stats_add_mg(){
         Persistent.stat_mg++;
@@ -356,6 +512,65 @@ public class MainController implements Initializable {
 
     }
 
+    public void stats_edit() {
+        if(stats_btn_edit.getText().equals("Bearbeiten")) {
+            //Set Text-Fields visible
+            stats_tf_mg.setVisible(true);
+            stats_tf_wg.setVisible(true);
+            stats_tf_dg.setVisible(true);
+            stats_tf_ms.setVisible(true);
+            stats_tf_ws.setVisible(true);
+            stats_tf_ds.setVisible(true);
+
+            //Put values in
+            stats_tf_mg.setText(stats_l_mg.getText());
+            stats_tf_wg.setText(stats_l_wg.getText());
+            stats_tf_dg.setText(stats_l_dg.getText());
+            stats_tf_ms.setText(stats_l_ms.getText());
+            stats_tf_ws.setText(stats_l_ws.getText());
+            stats_tf_ds.setText(stats_l_ds.getText());
+
+            stats_btn_edit.setText("Speichern");
+        }else if(stats_btn_edit.getText().equals("Speichern")) {
+            try {
+                //Save values
+                Persistent.stat_mg = Integer.valueOf(stats_tf_mg.getText());
+                Persistent.stat_wg = Integer.valueOf(stats_tf_wg.getText());
+                Persistent.stat_dg = Integer.valueOf(stats_tf_dg.getText());
+                Persistent.stat_ms = Integer.valueOf(stats_tf_ms.getText());
+                Persistent.stat_ws = Integer.valueOf(stats_tf_ws.getText());
+                Persistent.stat_ds = Integer.valueOf(stats_tf_ds.getText());
+            }catch (NumberFormatException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Fehler");
+                alert.setHeaderText(null);
+                alert.setContentText("Bitte gib nur Zahlen an!");
+                alert.show();
+                return;
+            }
+            //Put values in
+            stats_l_mg.setText(String.valueOf(Persistent.stat_mg));
+            stats_l_wg.setText(String.valueOf(Persistent.stat_wg));
+            stats_l_dg.setText(String.valueOf(Persistent.stat_dg));
+            stats_l_ms.setText(String.valueOf(Persistent.stat_ms));
+            stats_l_ws.setText(String.valueOf(Persistent.stat_ws));
+            stats_l_ds.setText(String.valueOf(Persistent.stat_ds));
+
+            //Set Text-Fields visible
+            stats_tf_mg.setVisible(false);
+            stats_tf_wg.setVisible(false);
+            stats_tf_dg.setVisible(false);
+            stats_tf_ms.setVisible(false);
+            stats_tf_ws.setVisible(false);
+            stats_tf_ds.setVisible(false);
+
+            stats_refresh_charts();
+
+            stats_btn_edit.setText("Bearbeiten");
+        }
+
+    }
+
     private void stats_refresh_charts() {
         stats_chart_mwd_data = FXCollections.observableArrayList(
                 new PieChart.Data("Männlich", Persistent.stat_mg + Persistent.stat_ms),
@@ -389,13 +604,15 @@ public class MainController implements Initializable {
     @FXML
     ListView random_listview_selected;
 
+    String random_selectedList;
+
     public void random_add_list(){
         try {
             URL url = new URL("file:src/de/villigst/dk/view/RandomNewListDialogView.fxml");
             Parent root = FXMLLoader.load(url);
             Stage stage = new Stage();
             stage.setTitle("Neue Liste...");
-            stage.setScene(new Scene(root,250, 300));
+            stage.setScene(new Scene(root,300, 450));
             stage.setResizable(false);
             stage.showAndWait();
 
@@ -410,6 +627,93 @@ public class MainController implements Initializable {
         random_listview_created.getItems().clear();
         for(String s : Persistent.random_lists.keySet()) {
             random_listview_created.getItems().add(s);
+        }
+    }
+
+
+    // ==================== Seite: Beschlusssammlung ====================
+
+    @FXML
+    Spinner bs_sp_dk, bs_sp_year;
+
+    @FXML
+    TextField bs_tf_page;
+
+    @FXML
+    Button bs_btn_contents, bs_btn_lastBS;
+
+    File contents, lastBS;
+
+    public void bs_choose_contents() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Inhaltsverzeichnis auswählen...");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF", "*.pdf"));
+        File selectedFile = fileChooser.showOpenDialog(FXMain.stage);
+        if(selectedFile != null) {
+            contents = selectedFile;
+            bs_btn_contents.setText(selectedFile.getName());
+        }
+
+    }
+
+    public void bs_choose_lastversion() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Letzte Beschlusssammlung auswählen...");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF", "*.pdf"));
+        File selectedFile = fileChooser.showOpenDialog(FXMain.stage);
+        if(selectedFile != null) {
+            lastBS = selectedFile;
+            bs_btn_lastBS.setText(selectedFile.getName());
+
+        }
+    }
+
+    public void bs_generate() {
+        if(contents == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Fehler");
+            alert.setHeaderText(null);
+            alert.setContentText("Bitte gib ein Inhaltsverzeichnis an!");
+            alert.show();
+        }else if(lastBS == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Fehler");
+            alert.setHeaderText(null);
+            alert.setContentText("Bitte gib die letzte Beschlusssammlung an!");
+            alert.show();
+        }else if(bs_tf_page.getText().isBlank()) {
+            //TODO test: isBlank()
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Fehler");
+            alert.setHeaderText(null);
+            alert.setContentText("Bitte gib die erste Seite mit Beschlüssen an!");
+            alert.show();
+        }else {
+            int offset;
+            try {
+                offset = Integer.valueOf(bs_tf_page.getText());
+            } catch (NumberFormatException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Fehler");
+                alert.setHeaderText(null);
+                alert.setContentText("Bitte gib eine gültige Seitenzahl an!");
+                alert.show();
+                return;
+            }
+
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Beschlusssammlung speichern");
+            File selectedFile = fileChooser.showSaveDialog(FXMain.stage);
+
+            if (selectedFile != null) {
+                //Generate!
+                String title = "Beschlusssammlung\n" + bs_sp_dk.getPromptText() + " " + bs_sp_year.getPromptText();
+                Generator.generateBeschlusssammlung(selectedFile, title, contents, lastBS, offset);
+                //Reset Buttons
+                bs_btn_contents.setText("PDF Datei auswählen...");
+                bs_btn_lastBS.setText("PDF Dateo auswählen...");
+                bs_tf_page.setText("");
+            }
         }
     }
 

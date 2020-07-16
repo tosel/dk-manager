@@ -57,6 +57,10 @@ public class Generator {
         PDFConverter.convert(getPath(target), pages, false);
     }
 
+    public static void generateBeschlusssammlung(File target, String title, File contents, File lastBS, int offset) {
+
+    }
+
     public static String getPath(File file) {
         if(!file.getName().endsWith(".pdf")) {
             return file.getPath() + ".pdf";
