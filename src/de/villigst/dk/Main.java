@@ -21,7 +21,7 @@ public class Main {
 
         //Read members
         MemberImport.importCSVFile(MEMBER_IMPORT_PATH);
-        for(DKMember m : Persistent.members) {
+        for(DKMember m : Persistent.getMembers()) {
             //System.out.println(m.toString());
         }
         //Generator.generateMeldeschilder(Persistent.members);
@@ -29,9 +29,9 @@ public class Main {
         //Generator.generateGremienschilder(Persistent.members);
         ContentManager manager = new ContentManager();
         manager.saveToFile("out/save.json");
-        Persistent.members = new ArrayList<>();
+        Persistent.setMembers(new ArrayList<>());
         manager.loadFromFile("out/save.json");
-        for(DKMember m : Persistent.members) {
+        for(DKMember m : Persistent.getMembers()) {
             System.out.println(m.toString());
         }
     }

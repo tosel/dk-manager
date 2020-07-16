@@ -33,7 +33,7 @@ public class MemberImport {
             }
         }
         //Save to persistence
-        Persistent.members.addAll(members);
+        Persistent.getMembers().addAll(members);
     }
 
     public static void importCSVFile(@NotNull String csvFilePath) {

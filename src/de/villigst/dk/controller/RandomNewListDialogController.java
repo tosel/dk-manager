@@ -29,7 +29,7 @@ public class RandomNewListDialogController extends Dialog {
     public void random_dialog_create() {
         if(random_dialog_cb_gaeste.isSelected() || random_dialog_cb_gs.isSelected() || random_dialog_cb_stipis.isSelected() || random_dialog_cb_pa.isSelected() || random_dialog_cb_senat.isSelected()) {
             if (random_dialog_name.getText().length() > 0) {
-                if(Persistent.random_lists.get(random_dialog_name.getText()) == null) {
+                if(Persistent.getRandomLists().get(random_dialog_name.getText()) == null) {
                     int limit;
                     try {
                         if(random_dialog_limit.getText().isBlank()) {
@@ -46,7 +46,7 @@ public class RandomNewListDialogController extends Dialog {
                         return;
                     }
                     List<DKMember> selected = new ArrayList<>();
-                    for (DKMember m : Persistent.members) {
+                    for (DKMember m : Persistent.getMembers()) {
                         if (m.isSenat() && random_dialog_cb_senat.isSelected()) {
                             selected.add(m);
                         } else if (m.isPA() && random_dialog_cb_pa.isSelected()){
@@ -62,8 +62,8 @@ public class RandomNewListDialogController extends Dialog {
                     Collections.shuffle(selected);
                     if(limit > 0) {
                         if(limit < selected.size()) {
-                            Persistent.random_lists.put(random_dialog_name.getText(), selected.subList(0, limit));
-                            Persistent.random_lists_selected.put(random_dialog_name.getText(), new HashMap<>());
+                            Persistent.getRandomLists().put(random_dialog_name.getText(), selected.subList(0, limit));
+                            Persistent.getRandomListsSelected().put(random_dialog_name.getText(), new HashMap<>());
                         }else {
                             Alert alert = new Alert(Alert.AlertType.ERROR);
                             alert.setTitle("Fehler");
@@ -73,8 +73,8 @@ public class RandomNewListDialogController extends Dialog {
                             return;
                         }
                     }else {
-                        Persistent.random_lists.put(random_dialog_name.getText(), selected);
-                        Persistent.random_lists_selected.put(random_dialog_name.getText(), new HashMap<>());
+                        Persistent.getRandomLists().put(random_dialog_name.getText(), selected);
+                        Persistent.getRandomListsSelected().put(random_dialog_name.getText(), new HashMap<>());
                     }
                     //Dialog schließen
                     random_dialog_name.getScene().getWindow().hide();

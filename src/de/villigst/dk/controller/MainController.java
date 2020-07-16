@@ -4,6 +4,7 @@ import de.villigst.dk.FXMain;
 import de.villigst.dk.logic.Generator;
 import de.villigst.dk.logic.MemberImport;
 import de.villigst.dk.model.DKMember;
+import de.villigst.dk.persistence.ContentManager;
 import de.villigst.dk.persistence.Persistent;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
@@ -61,7 +62,7 @@ public class MainController implements Initializable {
                 random_selectedList = newValue;
                 if(newValue != null) {
                     random_listview_selected.getItems().clear();
-                    for (DKMember m : Persistent.random_lists.get(newValue)) {
+                    for (DKMember m : Persistent.getRandomLists().get(newValue)) {
                         random_listview_selected.getItems().add(m.getDisplay());
                     }
                 }
@@ -78,7 +79,7 @@ public class MainController implements Initializable {
             members_listview_context_edit.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    for(DKMember member : Persistent.members) {
+                    for(DKMember member : Persistent.getMembers()) {
                         if(cell.itemProperty().getValue().equals(member.getDisplay())) {
                             //FOUND
                             //TODO implement
@@ -92,14 +93,14 @@ public class MainController implements Initializable {
             members_listview_context_delete.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent actionEvent) {
-                    for(DKMember member : Persistent.members) {
+                    for(DKMember member : Persistent.getMembers()) {
                         if(cell.itemProperty().getValue().equals(member.getDisplay())) {
                             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Teilnehmer wirklich entfernen?", ButtonType.CANCEL, ButtonType.YES);
                             alert.setTitle("Teilnehmer entfernen");
                             alert.setHeaderText(null);
                             alert.showAndWait();
                             if(alert.getResult() == ButtonType.YES) {
-                                Persistent.members.remove(member);
+                                Persistent.getMembers().remove(member);
                             }
                             break;
                         }
@@ -138,14 +139,14 @@ public class MainController implements Initializable {
         print_listview.setCellFactory(CheckBoxListCell.forListView(new Callback<String, ObservableValue<Boolean>>() {
             @Override
             public ObservableValue<Boolean> call(String item) {
-                if(Persistent.print_selected.get(item) == null) {
+                if(Persistent.getPrintSelected().get(item) == null) {
                     BooleanProperty prop = new SimpleBooleanProperty(false);
                     prop.addListener((obs, wasSelected, isNowSelected) -> {
-                        Persistent.print_selected.put(item, prop);
+                        Persistent.getPrintSelected().put(item, prop);
                     });
-                    Persistent.print_selected.put(item, prop);
+                    Persistent.getPrintSelected().put(item, prop);
                 }
-                return Persistent.print_selected.get(item);
+                return Persistent.getPrintSelected().get(item);
             }
         }));
 
@@ -157,12 +158,11 @@ public class MainController implements Initializable {
                     //keine Liste ausgewählt
                     return new SimpleBooleanProperty(false);
                 }else {
-                    System.out.println(random_selectedList);
-                    if(Persistent.random_lists_selected.get(random_selectedList).get(s) == null) {
-                        Persistent.random_lists_selected.get(random_selectedList).put(s, new SimpleBooleanProperty(false));
+                    if(Persistent.getRandomListsSelected().get(random_selectedList).get(s) == null) {
+                        Persistent.getRandomListsSelected().get(random_selectedList).put(s, new SimpleBooleanProperty(false));
                     }
                 }
-                return Persistent.random_lists_selected.get(random_selectedList).get(s);
+                return Persistent.getRandomListsSelected().get(random_selectedList).get(s);
             }
         }));
     }
@@ -170,7 +170,7 @@ public class MainController implements Initializable {
 
 
     private void refresh_members() {
-        Collections.sort(Persistent.members);
+        Collections.sort(Persistent.getMembers());
         members_refresh_listview();
         print_refresh_listview();
     }
@@ -181,7 +181,7 @@ public class MainController implements Initializable {
     TextArea overview_ta_notes;
 
     public void overview_ta_onkeytyped() {
-        Persistent.notes = overview_ta_notes.getText();
+        Persistent.setNotes(overview_ta_notes.getText());
     }
 
     public void overview_reset_content() {
@@ -190,14 +190,10 @@ public class MainController implements Initializable {
         alert.setHeaderText(null);
         alert.showAndWait();
         if(alert.getResult() == ButtonType.YES) {
-            Persistent.members = new ArrayList<>();
-            Persistent.random_lists = new HashMap<>();
-            Persistent.stat_mg = 0;
-            Persistent.stat_wg = 0;
-            Persistent.stat_dg = 0;
-            Persistent.stat_ms = 0;
-            Persistent.stat_ws = 0;
-            Persistent.stat_ds = 0;
+            ContentManager.reset();
+            overview_ta_notes.setText(Persistent.getNotes());
+            refresh_members();
+            stats_refresh_charts();
         }
     }
 
@@ -247,7 +243,7 @@ public class MainController implements Initializable {
         alert.setHeaderText(null);
         alert.showAndWait();
         if(alert.getResult() == ButtonType.YES) {
-            Persistent.members = new ArrayList<>();
+            Persistent.setMembers(new ArrayList<>());
             refresh_members();
         }
     }
@@ -256,7 +252,7 @@ public class MainController implements Initializable {
         String filter = members_filter.getText();
         if(filter.length() > 0) {
             members_listview.getItems().clear();
-            for (DKMember m : Persistent.members) {
+            for (DKMember m : Persistent.getMembers()) {
                 if (m.getDisplay().toLowerCase().contains(filter.toLowerCase())) {
                     members_listview.getItems().add(m.getDisplay());
                 }
@@ -268,7 +264,7 @@ public class MainController implements Initializable {
 
     private void members_refresh_listview() {
         members_listview.getItems().clear();
-        for(DKMember m : Persistent.members) {
+        for(DKMember m : Persistent.getMembers()) {
             members_listview.getItems().add(m.getDisplay());
         }
     }
@@ -296,8 +292,8 @@ public class MainController implements Initializable {
         fileChooser.setTitle("Speichern: Namensschilder");
         File selectedFile = fileChooser.showSaveDialog(FXMain.stage);
         if(selectedFile != null) {
-            if(Persistent.members.size() > 0) {
-                Generator.generateNamensschilder(Persistent.members, selectedFile);
+            if(Persistent.getMembers().size() > 0) {
+                Generator.generateNamensschilder(Persistent.getMembers(), selectedFile);
             }else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Fehler");
@@ -313,8 +309,8 @@ public class MainController implements Initializable {
         fileChooser.setTitle("Speichern: Meldeschilder");
         File selectedFile = fileChooser.showSaveDialog(FXMain.stage);
         if(selectedFile != null) {
-            if(Persistent.members.size() > 0) {
-                Generator.generateMeldeschilder(Persistent.members, selectedFile);
+            if(Persistent.getMembers().size() > 0) {
+                Generator.generateMeldeschilder(Persistent.getMembers(), selectedFile);
             }else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Fehler");
@@ -330,8 +326,8 @@ public class MainController implements Initializable {
         fileChooser.setTitle("Speichern: Gremienschilder");
         File selectedFile = fileChooser.showSaveDialog(FXMain.stage);
         if(selectedFile != null) {
-            if(Persistent.members.size() > 0) {
-                Generator.generateGremienschilder(Persistent.members, selectedFile);
+            if(Persistent.getMembers().size() > 0) {
+                Generator.generateGremienschilder(Persistent.getMembers(), selectedFile);
             }else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Fehler");
@@ -350,9 +346,9 @@ public class MainController implements Initializable {
         if(namensschilder || meldeschilder || gremienschilder) {
             List<DKMember> toReprint = new ArrayList<>();
             //unschön...
-            for(String s : Persistent.print_selected.keySet()) {
-                if(Persistent.print_selected.get(s).getValue()) {
-                    for(DKMember m : Persistent.members) {
+            for(String s : Persistent.getPrintSelected().keySet()) {
+                if(Persistent.getPrintSelected().get(s).getValue()) {
+                    for(DKMember m : Persistent.getMembers()) {
                         if(m.getDisplay().equals(s)) {
                             toReprint.add(m);
                         }
@@ -409,7 +405,7 @@ public class MainController implements Initializable {
         String filter = print_filter.getText();
         if(filter.length() > 0) {
             print_listview.getItems().clear();
-            for (DKMember m : Persistent.members) {
+            for (DKMember m : Persistent.getMembers()) {
                 if (m.getDisplay().toLowerCase().contains(filter.toLowerCase())) {
                     print_listview.getItems().add(m.getDisplay());
                 }
@@ -421,7 +417,7 @@ public class MainController implements Initializable {
 
     private void print_refresh_listview() {
         print_listview.getItems().clear();
-        for(DKMember m : Persistent.members) {
+        for(DKMember m : Persistent.getMembers()) {
             print_listview.getItems().add(m.getDisplay());
         }
     }
@@ -457,54 +453,53 @@ public class MainController implements Initializable {
     TextField stats_tf_ms, stats_tf_ws, stats_tf_ds;
 
     public void stats_add_mg(){
-        Persistent.stat_mg++;
+        Persistent.setStatMG(Persistent.getStatMG() + 1);
         stats_refresh_charts();
     }
     public void stats_add_wg(){
-        Persistent.stat_wg++;
+        Persistent.setStatWG(Persistent.getStatWG() + 1);
         stats_refresh_charts();
     }
     public void stats_add_dg(){
-        Persistent.stat_dg++;
+        Persistent.setStatDG(Persistent.getStatDG() + 1);
         stats_refresh_charts();
     }
     public void stats_add_ms(){
-        Persistent.stat_ms++;
+        Persistent.setStatMS(Persistent.getStatMS() + 1);
         stats_refresh_charts();
     }
     public void stats_add_ws(){
-        Persistent.stat_ws++;
+        Persistent.setStatWS(Persistent.getStatWS() + 1);
         stats_refresh_charts();
     }
     public void stats_add_ds(){
-        Persistent.stat_ds++;
+        Persistent.setStatDS(Persistent.getStatDS() + 1);
         stats_refresh_charts();
     }
 
 
     public void stats_rem_mg(){
-        Persistent.stat_mg--;
+        Persistent.setStatMG(Persistent.getStatMG()>0?Persistent.getStatMG() - 1:0);
         stats_refresh_charts();
     }
     public void stats_rem_wg(){
-        Persistent.stat_wg--;
+        Persistent.setStatWG(Persistent.getStatMG()>0?Persistent.getStatWG() - 1:0);
         stats_refresh_charts();
-
     }
     public void stats_rem_dg(){
-        Persistent.stat_dg--;
+        Persistent.setStatDG(Persistent.getStatMG()>0?Persistent.getStatDG() - 1:0);
         stats_refresh_charts();
     }
     public void stats_rem_ms(){
-        Persistent.stat_ms--;
+        Persistent.setStatMS(Persistent.getStatMG()>0?Persistent.getStatMS() - 1:0);
         stats_refresh_charts();
     }
     public void stats_rem_ws(){
-        Persistent.stat_ws--;
+        Persistent.setStatWS(Persistent.getStatMG()>0?Persistent.getStatWS() - 1:0);
         stats_refresh_charts();
     }
     public void stats_rem_ds(){
-        Persistent.stat_ds--;
+        Persistent.setStatDS(Persistent.getStatMG()>0?Persistent.getStatDS() - 1:0);
         stats_refresh_charts();
     }
 
@@ -534,12 +529,12 @@ public class MainController implements Initializable {
         }else if(stats_btn_edit.getText().equals("Speichern")) {
             try {
                 //Save values
-                Persistent.stat_mg = Integer.valueOf(stats_tf_mg.getText());
-                Persistent.stat_wg = Integer.valueOf(stats_tf_wg.getText());
-                Persistent.stat_dg = Integer.valueOf(stats_tf_dg.getText());
-                Persistent.stat_ms = Integer.valueOf(stats_tf_ms.getText());
-                Persistent.stat_ws = Integer.valueOf(stats_tf_ws.getText());
-                Persistent.stat_ds = Integer.valueOf(stats_tf_ds.getText());
+                Persistent.setStatMG(Integer.valueOf(stats_tf_mg.getText()));
+                Persistent.setStatWG(Integer.valueOf(stats_tf_wg.getText()));
+                Persistent.setStatDG(Integer.valueOf(stats_tf_dg.getText()));
+                Persistent.setStatMS(Integer.valueOf(stats_tf_ms.getText()));
+                Persistent.setStatWS(Integer.valueOf(stats_tf_ws.getText()));
+                Persistent.setStatDS(Integer.valueOf(stats_tf_ds.getText()));
             }catch (NumberFormatException ex) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Fehler");
@@ -549,12 +544,12 @@ public class MainController implements Initializable {
                 return;
             }
             //Put values in
-            stats_l_mg.setText(String.valueOf(Persistent.stat_mg));
-            stats_l_wg.setText(String.valueOf(Persistent.stat_wg));
-            stats_l_dg.setText(String.valueOf(Persistent.stat_dg));
-            stats_l_ms.setText(String.valueOf(Persistent.stat_ms));
-            stats_l_ws.setText(String.valueOf(Persistent.stat_ws));
-            stats_l_ds.setText(String.valueOf(Persistent.stat_ds));
+            stats_l_mg.setText(String.valueOf(Persistent.getStatMG()));
+            stats_l_wg.setText(String.valueOf(Persistent.getStatWG()));
+            stats_l_dg.setText(String.valueOf(Persistent.getStatDG()));
+            stats_l_ms.setText(String.valueOf(Persistent.getStatMS()));
+            stats_l_ws.setText(String.valueOf(Persistent.getStatWS()));
+            stats_l_ds.setText(String.valueOf(Persistent.getStatDS()));
 
             //Set Text-Fields visible
             stats_tf_mg.setVisible(false);
@@ -573,23 +568,23 @@ public class MainController implements Initializable {
 
     private void stats_refresh_charts() {
         stats_chart_mwd_data = FXCollections.observableArrayList(
-                new PieChart.Data("Männlich", Persistent.stat_mg + Persistent.stat_ms),
-                new PieChart.Data("Weiblich", Persistent.stat_wg + Persistent.stat_ws),
-                new PieChart.Data("Divers", Persistent.stat_dg + Persistent.stat_ds));
+                new PieChart.Data("Männlich", Persistent.getStatMG() + Persistent.getStatMS()),
+                new PieChart.Data("Weiblich", Persistent.getStatWG() + Persistent.getStatWS()),
+                new PieChart.Data("Divers", Persistent.getStatDG() + Persistent.getStatDS()));
         stats_chart_mwd.setData(stats_chart_mwd_data);
 
         stats_chart_gremianer_data = FXCollections.observableArrayList(
-                new PieChart.Data("Gremianer", Persistent.stat_mg + Persistent.stat_wg + Persistent.stat_dg),
-                new PieChart.Data("Nicht-Gremianer", Persistent.stat_ms + Persistent.stat_ws + Persistent.stat_ds));
+                new PieChart.Data("Gremianer", Persistent.getStatMG() + Persistent.getStatWG() + Persistent.getStatDG()),
+                new PieChart.Data("Nicht-Gremianer", Persistent.getStatMS() + Persistent.getStatWS() + Persistent.getStatDS()));
         stats_chart_gremianer.setData(stats_chart_gremianer_data);
 
-        stats_l_mg.setText(String.valueOf(Persistent.stat_mg));
-        stats_l_wg.setText(String.valueOf(Persistent.stat_wg));
-        stats_l_dg.setText(String.valueOf(Persistent.stat_dg));
+        stats_l_mg.setText(String.valueOf(Persistent.getStatMG()));
+        stats_l_wg.setText(String.valueOf(Persistent.getStatWG()));
+        stats_l_dg.setText(String.valueOf(Persistent.getStatDG()));
 
-        stats_l_ms.setText(String.valueOf(Persistent.stat_ms));
-        stats_l_ws.setText(String.valueOf(Persistent.stat_ws));
-        stats_l_ds.setText(String.valueOf(Persistent.stat_ds));
+        stats_l_ms.setText(String.valueOf(Persistent.getStatMS()));
+        stats_l_ws.setText(String.valueOf(Persistent.getStatWS()));
+        stats_l_ds.setText(String.valueOf(Persistent.getStatDS()));
     }
 
 
@@ -625,7 +620,7 @@ public class MainController implements Initializable {
     public void random_refresh_list() {
         random_label_selected.setText("Liste:");
         random_listview_created.getItems().clear();
-        for(String s : Persistent.random_lists.keySet()) {
+        for(String s : Persistent.getRandomLists().keySet()) {
             random_listview_created.getItems().add(s);
         }
     }

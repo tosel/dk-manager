@@ -11,10 +11,6 @@ import java.util.List;
  * Enthält alle Variablen, die gespeichert werden
  */
 public class Persistent {
-    //Constanten
-    public static final String OUTPUT_PATH = "out/";
-
-
     //Zu Speichern:
     private static List<DKMember> members = new ArrayList<>();
 

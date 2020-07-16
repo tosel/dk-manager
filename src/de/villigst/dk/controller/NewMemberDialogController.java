@@ -32,7 +32,7 @@ public class NewMemberDialogController extends Dialog {
             alert.show();
         }else {
             DKMember toAdd = new DKMember(member_dialog_name.getText(), member_dialog_konvent.getText(), member_dialog_amt.getText());
-            Persistent.members.add(toAdd);
+            Persistent.getMembers().add(toAdd);
             //close
             member_dialog_name.getScene().getWindow().hide();
         }

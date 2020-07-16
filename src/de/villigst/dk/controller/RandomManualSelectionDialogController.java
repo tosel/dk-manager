@@ -51,7 +51,7 @@ public class RandomManualSelectionDialogController extends Dialog implements Ini
 
         for(String s : selected.keySet()) {
             if(selected.get(s).getValue()) {
-                for(DKMember m : Persistent.members) {
+                for(DKMember m : Persistent.getMembers()) {
                     if(m.getDisplay().equalsIgnoreCase(s)) {
                         selectedMembers.add(m);
                     }
@@ -61,8 +61,8 @@ public class RandomManualSelectionDialogController extends Dialog implements Ini
 
         if(!selectedMembers.isEmpty()) {
 
-            Persistent.random_lists.put(title, selectedMembers);
-            Persistent.random_lists_selected.put(title, new HashMap<>());
+            Persistent.getRandomLists().put(title, selectedMembers);
+            Persistent.getRandomListsSelected().put(title, new HashMap<>());
 
 
             select_filter.getScene().getWindow().hide();
@@ -79,7 +79,7 @@ public class RandomManualSelectionDialogController extends Dialog implements Ini
         String filter = select_filter.getText();
         if(filter.length() > 0) {
             select_listview.getItems().clear();
-            for (DKMember m : Persistent.members) {
+            for (DKMember m : Persistent.getMembers()) {
                 if (m.getDisplay().toLowerCase().contains(filter.toLowerCase())) {
                     select_listview.getItems().add(m.getDisplay());
                 }
@@ -91,7 +91,7 @@ public class RandomManualSelectionDialogController extends Dialog implements Ini
 
     public void select_refresh_listview() {
         select_listview.getItems().clear();
-        for(DKMember m : Persistent.members) {
+        for(DKMember m : Persistent.getMembers()) {
             select_listview.getItems().add(m.getDisplay());
         }
     }
