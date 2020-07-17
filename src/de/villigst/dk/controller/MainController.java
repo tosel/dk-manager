@@ -635,9 +635,9 @@ public class MainController implements Initializable {
     TextField bs_tf_page;
 
     @FXML
-    Button bs_btn_contents, bs_btn_lastBS;
+    Button bs_btn_contents, bs_btn_lastBS, bs_btn_newBS;
 
-    File contents, lastBS;
+    File contents, lastBS, newBS;
 
     public void bs_choose_contents() {
         FileChooser fileChooser = new FileChooser();
@@ -659,7 +659,17 @@ public class MainController implements Initializable {
         if(selectedFile != null) {
             lastBS = selectedFile;
             bs_btn_lastBS.setText(selectedFile.getName());
+        }
+    }
 
+    public void bs_choose_newbs() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Neue Beschlüsse auswählen...");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF", "*.pdf"));
+        File selectedFile = fileChooser.showOpenDialog(FXMain.stage);
+        if(selectedFile != null) {
+            newBS = selectedFile;
+            bs_btn_newBS.setText(selectedFile.getName());
         }
     }
 
@@ -675,6 +685,12 @@ public class MainController implements Initializable {
             alert.setTitle("Fehler");
             alert.setHeaderText(null);
             alert.setContentText("Bitte gib die letzte Beschlusssammlung an!");
+            alert.show();
+        }else if(newBS == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Fehler");
+            alert.setHeaderText(null);
+            alert.setContentText("Bitte gib die Beschlüsse der aktuellen DK an!");
             alert.show();
         }else if(bs_tf_page.getText().isBlank()) {
             //TODO test: isBlank()
@@ -703,10 +719,11 @@ public class MainController implements Initializable {
             if (selectedFile != null) {
                 //Generate!
                 String title = "Beschlusssammlung\n" + bs_sp_dk.getPromptText() + " " + bs_sp_year.getPromptText();
-                Generator.generateBeschlusssammlung(selectedFile, title, contents, lastBS, offset);
+                Generator.generateBeschlusssammlung(selectedFile, title, contents, lastBS, newBS, offset);
                 //Reset Buttons
                 bs_btn_contents.setText("PDF Datei auswählen...");
-                bs_btn_lastBS.setText("PDF Dateo auswählen...");
+                bs_btn_lastBS.setText("PDF Datei auswählen...");
+                bs_btn_newBS.setText("PDF Datei auswählen...");
                 bs_tf_page.setText("");
             }
         }

@@ -25,7 +25,7 @@
          <tabs>
             <Tab text="Übersicht">
                <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="1111.0">
                      <children>
                         <Label layoutX="29.0" layoutY="25.0" text="Notizen">
                            <font>
@@ -447,14 +447,25 @@
                               <Font size="16.0" />
                            </font>
                         </TextField>
-                        <Button layoutX="39.0" layoutY="346.0" mnemonicParsing="false" onAction="#bs_generate" prefHeight="86.0" prefWidth="239.0" text="Neue Beschlusssammlung&#10;generieren" textAlignment="CENTER">
+                        <Button layoutX="39.0" layoutY="409.0" mnemonicParsing="false" onAction="#bs_generate" prefHeight="86.0" prefWidth="239.0" text="Neue Beschlusssammlung&#10;generieren" textAlignment="CENTER">
                            <font>
                               <Font size="16.0" />
                            </font>
                         </Button>
+                        <Button fx:id="bs_btn_newBS" layoutX="38.0" layoutY="335.0" mnemonicParsing="false" onAction="#bs_choose_newbs" prefHeight="37.0" prefWidth="236.0" text="PDF Datei auswählen...">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
+                        <Label layoutX="39.0" layoutY="311.0" text="Neue Beschlüsse" />
                      </children>
                   </AnchorPane>
                </content>
+            </Tab>
+            <Tab text="Einstellungen">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              </content>
             </Tab>
          </tabs>
       </TabPane>

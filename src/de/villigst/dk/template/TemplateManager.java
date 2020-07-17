@@ -19,8 +19,8 @@ public enum TemplateManager {
                 return s;
             }catch(IOException ex) {
                 ex.printStackTrace();
+                return null;
             }
-            return null;
         }
     }, NAMENSSCHILD_ENTITY {
         @Override
@@ -32,8 +32,8 @@ public enum TemplateManager {
                 return s;
             }catch(IOException ex) {
                 ex.printStackTrace();
+                return null;
             }
-            return null;
         }
     }, NAMENSSCHILD_WRAPPER {
         public String getString(List<String> htmls) {
@@ -52,8 +52,8 @@ public enum TemplateManager {
                 }
             }catch(IOException ex) {
                 ex.printStackTrace();
+                return null;
             }
-            return null;
         }
     }, GREMIENSCHILD {
         @Override
@@ -65,8 +65,21 @@ public enum TemplateManager {
                 return s;
             }catch(IOException ex) {
                 ex.printStackTrace();
+                return null;
             }
-            return null;
+        }
+    }, BS_TITLE {
+        @Override
+        public String getString(String dk, String date) {
+            try {
+                String s = Files.readString(Paths.get("src/de/villigst/dk/template/bs_titel_a4.html"));
+                s = s.replace("{{dk}}", dk);
+                s = s.replace("{{datum}}", date);
+                return s;
+            }catch (IOException ex) {
+                ex.printStackTrace();
+                return null;
+            }
         }
     };
 

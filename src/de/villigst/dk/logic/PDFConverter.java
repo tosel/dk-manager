@@ -16,7 +16,6 @@ import java.util.List;
 public class PDFConverter {
 
     /***
-     *
      * @param pdfDestPath Pfad der Zieldatei
      * @param htmls HTML-Input - Eine Seite pro Item
      * @param landscape Orientierung des Dokumentes
@@ -40,6 +39,21 @@ public class PDFConverter {
             pdf.close();
         }catch (IOException ex) {
             Logger.error("Error during conversion: " + ex.getMessage());
+        }
+    }
+
+    public static PdfDocument convert(@NotNull String html, boolean landscape) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PdfDocument temp = new PdfDocument(new PdfWriter(baos));
+            if (landscape) temp.setDefaultPageSize(PageSize.A4.rotate());
+            HtmlConverter.convertToPdf(new ByteArrayInputStream(html.getBytes()), temp);
+            temp = new PdfDocument(
+                    new PdfReader(new ByteArrayInputStream(baos.toByteArray())));
+            return temp;
+        }catch (IOException ex) {
+            Logger.error("Error during conversion: " + ex.getMessage());
+            return null;
         }
     }
 
